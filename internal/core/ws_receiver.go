@@ -6,20 +6,19 @@ import (
 	"cqhttp-server/internal/pkg"
 	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
 
 type WSReceiver struct {
 	MetaMessage []byte
+	Group       *Group
 	timeout     <-chan time.Time
 }
 
 //NewReceiver 新建接受器
-func NewReceiver(msg []byte, duration time.Duration) *WSReceiver {
-	return &WSReceiver{MetaMessage: msg, timeout: time.After(duration)}
+func NewReceiver(group *Group, msg []byte, duration time.Duration) *WSReceiver {
+	return &WSReceiver{Group: group, MetaMessage: msg, timeout: time.After(duration)}
 }
 
 func (w WSReceiver) Task() {
@@ -64,22 +63,35 @@ func (w WSReceiver) postHandler(err error) {
 
 	switch eventMsg.SubType {
 	case "friend":
+		//todo 注册
+		f := w.Group.GetHandler(eventMsg.Message)
 
-		if eventMsg.Sender.UserId != 978766951 {
+		//todo 传入eventMsg 返回callback
+		ctx := Background(eventMsg)
+		err := f(ctx)
+		if err != nil {
 			return
 		}
 
-		if strings.Contains(eventMsg.Message, "图片") {
-			callback := model.QQCallback{
-				Action: "send_private_msg",
-				Params: model.PrivateSender{
-					//MessageType: eventMsg.SubType,
-					UserId:  eventMsg.Sender.UserId,
-					Message: fmt.Sprintf("[CQ:image,file=%s]", GetRandFileAbsPath("./download")),
-				},
-			}
-			_ = WsConn.conn.WriteJSON(callback)
+		if ctx.callback != nil {
+			_ = WsConn.conn.WriteJSON(ctx.callback)
 		}
+
+		//if eventMsg.Sender.UserId != 978766951 {
+		//	return
+		//}
+		//
+		//if strings.Contains(eventMsg.Message, "图片") {
+		//	callback := model.Callback{
+		//		Action: "send_private_msg",
+		//		Params: model.PrivateSender{
+		//			//MessageType: eventMsg.SubType,
+		//			UserId:  eventMsg.Sender.UserId,
+		//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+		//		},
+		//	}
+		//	_ = WsConn.conn.WriteJSON(callback)
+		//}
 	//case "group":
 	default:
 		var groupMsg *post.GroupMsg
@@ -92,11 +104,11 @@ func (w WSReceiver) postHandler(err error) {
 		}
 
 		if strings.Contains(eventMsg.Message, "图片") {
-			callback := model.QQCallback{
+			callback := model.Callback{
 				Action: "send_group_msg",
 				Params: model.GroupSender{
 					GroupId: groupMsg.GroupId,
-					Message: fmt.Sprintf("[CQ:image,file=%s]", GetRandFileAbsPath("./download")),
+					Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
 				},
 			}
 			_ = WsConn.conn.WriteJSON(callback)
@@ -108,20 +120,21 @@ func (w WSReceiver) postHandler(err error) {
 
 }
 
-func GetRandFileAbsPath(path string) string {
-	return "file:///" + GetRandFile(path)
+type Group struct {
+	router map[string]HandlerFunc
 }
 
-// GetRandFile 随机获取目录下的文件绝对路径
-// todo 做一个资源池
-//  	获取目录下的文件(目录可配置),然后随机获取一个文件的绝对路径
-func GetRandFile(path string) string {
-	dir, err := os.ReadDir(path)
-	if err != nil {
-		return ""
-	}
-
-	randInt := pkg.RandInt(len(dir))
-	abs, _ := filepath.Abs(path + "/" + dir[randInt].Name())
-	return abs
+func NewGroup() *Group {
+	return &Group{router: make(map[string]HandlerFunc)}
 }
+
+func (g *Group) Register(key string, handlerFunc HandlerFunc) {
+	g.router[key] = handlerFunc
+}
+
+func (g *Group) GetHandler(key string) HandlerFunc {
+	return g.router[key]
+}
+
+// HandlerFunc 控制器
+type HandlerFunc func(ctx *Context) error

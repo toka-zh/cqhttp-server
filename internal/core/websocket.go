@@ -1,6 +1,9 @@
 package core
 
 import (
+	"cqhttp-server/internal/model"
+	"cqhttp-server/internal/pkg"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -22,6 +25,8 @@ type WebSocket struct {
 
 // SocketHandler 加入任务池
 func SocketHandler(c *gin.Context) {
+	group := NewGroup()
+	Register(group)
 
 	// 注册websocket
 	upGrader := websocket.Upgrader{
@@ -52,7 +57,38 @@ func SocketHandler(c *gin.Context) {
 
 		//获取到消息byte
 
-		MyWorker.Run(NewReceiver(msg, 8*time.Second))
+		MyWorker.Run(NewReceiver(group, msg, 8*time.Second))
 	}
 
 }
+
+func Register(api *Group) {
+	api.Register("图片", func(ctx *Context) error {
+		callback := &model.Callback{
+			Action: "send_private_msg",
+			Params: model.PrivateSender{
+				//MessageType: eventMsg.SubType,
+				UserId:  ctx.metaMsg.Sender.UserId,
+				Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+			},
+		}
+		ctx.callback = callback
+		return nil
+	})
+}
+
+//if eventMsg.Sender.UserId != 978766951 {
+//	return
+//}
+//
+//if strings.Contains(eventMsg.Message, "图片") {
+//	callback := model.Callback{
+//		Action: "send_private_msg",
+//		Params: model.PrivateSender{
+//			//MessageType: eventMsg.SubType,
+//			UserId:  eventMsg.Sender.UserId,
+//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+//		},
+//	}
+//	_ = WsConn.conn.WriteJSON(callback)
+//}

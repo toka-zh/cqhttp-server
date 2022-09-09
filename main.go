@@ -13,9 +13,9 @@ func WSWorker() *core.Pool {
 
 func main() {
 	core.MyWorker = WSWorker()
+	// 注册路由器
 
 	router := gin.Default()
-
 	router.GET("/", core.SocketHandler)
 
 	_ = router.Run(":9999")

@@ -13,7 +13,7 @@ type GroupSender struct {
 	Message interface{} `json:"message"`
 }
 
-type QQCallback struct {
+type Callback struct {
 	Action string      `json:"action"`
 	Params interface{} `json:"params"`
 	Echo   string      `json:"echo"`
