@@ -3,6 +3,7 @@ package core
 import (
 	"cqhttp-server/internal/model"
 	"cqhttp-server/internal/pkg"
+	pkg2 "cqhttp-server/pkg"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -64,12 +65,17 @@ func SocketHandler(c *gin.Context) {
 
 func Register(api *Group) {
 	api.Register("图片", func(ctx *Context) error {
+		path := pkg.GetRandFileAbsPath("./download")
+		if path == "" {
+			pkg2.Craw("https://www.pixiv.net/ranking.php?mode=monthly&content=illust")
+			path = pkg.GetRandFileAbsPath("./download")
+		}
 		callback := &model.Callback{
 			Action: "send_private_msg",
 			Params: model.PrivateSender{
 				//MessageType: eventMsg.SubType,
 				UserId:  ctx.metaMsg.Sender.UserId,
-				Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+				Message: fmt.Sprintf("[CQ:image,file=%s]", path),
 			},
 		}
 		ctx.callback = callback

@@ -14,12 +14,17 @@ func FileExists(path string) bool {
 }
 
 func GetRandFileAbsPath(path string) string {
-	return "file:///" + GetRandFile(path)
+	file := GetRandFile(path)
+	if file == "" {
+		return ""
+	}
+	return "file:///" + file
 }
 
 // GetRandFile 随机获取目录下的文件绝对路径
 // todo 做一个资源池
-//  	获取目录下的文件(目录可配置),然后随机获取一个文件的绝对路径
+//
+//	获取目录下的文件(目录可配置),然后随机获取一个文件的绝对路径
 func GetRandFile(path string) string {
 	dir, err := os.ReadDir(path)
 	if err != nil {

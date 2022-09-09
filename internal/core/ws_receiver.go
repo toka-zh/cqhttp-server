@@ -4,6 +4,7 @@ import (
 	"cqhttp-server/internal/model"
 	"cqhttp-server/internal/model/post"
 	"cqhttp-server/internal/pkg"
+	pkg2 "cqhttp-server/pkg"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -16,7 +17,7 @@ type WSReceiver struct {
 	timeout     <-chan time.Time
 }
 
-//NewReceiver 新建接受器
+// NewReceiver 新建接受器
 func NewReceiver(group *Group, msg []byte, duration time.Duration) *WSReceiver {
 	return &WSReceiver{Group: group, MetaMessage: msg, timeout: time.After(duration)}
 }
@@ -104,11 +105,16 @@ func (w WSReceiver) postHandler(err error) {
 		}
 
 		if strings.Contains(eventMsg.Message, "图片") {
+			path := pkg.GetRandFileAbsPath("./download")
+			if path == "" {
+				pkg2.Craw("https://www.pixiv.net/ranking.php?mode=monthly&content=illust")
+				path = pkg.GetRandFileAbsPath("./download")
+			}
 			callback := model.Callback{
 				Action: "send_group_msg",
 				Params: model.GroupSender{
 					GroupId: groupMsg.GroupId,
-					Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+					Message: fmt.Sprintf("[CQ:image,file=%s]", path),
 				},
 			}
 			_ = WsConn.conn.WriteJSON(callback)

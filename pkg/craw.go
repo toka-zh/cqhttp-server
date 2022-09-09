@@ -3,22 +3,25 @@ package pkg
 import (
 	"cqhttp-server/internal/pkg"
 	"github.com/PuerkitoBio/goquery"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 )
 
-func Craw(target string) {
-	getRobots(target)
+func Craw(target string) error {
+	//getRobots(target)
+	log.Println("pixiv craw starting...")
 
 	// 获取排行版的所有图片
 	resp, err := http.Get(target)
 	if err != nil {
-		return
+		return err
 	}
-	all, _ := ioutil.ReadAll(resp.Body)
+	all, _ := io.ReadAll(resp.Body)
 	body := string(all)
 
 	dom, _ := goquery.NewDocumentFromReader(strings.NewReader(body))
@@ -50,17 +53,18 @@ func Craw(target string) {
 				return
 			}
 
-			readAll, err := ioutil.ReadAll(data.Body)
+			readAll, err := io.ReadAll(data.Body)
 			if err != nil {
 				return
 			}
 
-			err = ioutil.WriteFile(filename, readAll, 0666)
+			err = os.WriteFile(filename, readAll, 0666)
 			if err != nil {
 				return
 			}
 		},
 	)
+	return nil
 }
 
 func getRobots(target string) {
@@ -75,7 +79,7 @@ func getRobots(target string) {
 	if err != nil {
 		return
 	}
-	all, _ := ioutil.ReadAll(resp.Body)
+	all, _ := io.ReadAll(resp.Body)
 	s := string(all)
 
 	split := strings.Split(s, "\n")

@@ -16,7 +16,7 @@ func main() {
 	// 注册路由器
 
 	router := gin.Default()
-	router.GET("/", core.SocketHandler)
+	router.GET("/ws", core.SocketHandler)
 
 	_ = router.Run(":9999")
 }
