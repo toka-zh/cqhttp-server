@@ -3,6 +3,7 @@ package main
 import (
 	"cqhttp-server/internal/core"
 	"github.com/gin-gonic/gin"
+	"os"
 )
 
 func WSWorker() *core.Pool {
@@ -12,6 +13,11 @@ func WSWorker() *core.Pool {
 }
 
 func main() {
+	args := os.Args
+	if args[0] == "-version" || args[0] == "-v" {
+		return
+	}
+
 	core.MyWorker = WSWorker()
 	// 注册路由器
 

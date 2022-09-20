@@ -13,17 +13,39 @@ import (
 )
 
 func Craw(target string) error {
-	//getRobots(target)
-	log.Println("pixiv craw starting...")
+	log.Println("pixiv craw running...")
 
-	// 获取排行版的所有图片
-	resp, err := http.Get(target)
+	// 确认下载目录在不在
+	_, err := os.Stat("./download")
+	if err != nil {
+		log.Println("download dir doesn't exist,recreate...")
+		os.Mkdir("./download", 0777)
+	}
+
+	// 获取不能爬取的列表
+	// getRobots(target)
+
+	client := &http.Client{}
+
+	// 如果请求错误使用代理
+	testReq, _ := http.NewRequest(http.MethodGet, target, nil)
+	if _, err := client.Do(testReq); err != nil {
+		log.Println("connect failed,try to use proxy...")
+		proxy, _ := url.Parse("http://localhost:7890")
+		transport := &http.Transport{Proxy: http.ProxyURL(proxy)}
+		client = &http.Client{Transport: transport}
+	}
+
+	// 获取链接内容
+	req, _ := http.NewRequest(http.MethodGet, target, nil)
+	do, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	all, _ := io.ReadAll(resp.Body)
+	all, _ := io.ReadAll(do.Body)
 	body := string(all)
 
+	// 转化为dom对象
 	dom, _ := goquery.NewDocumentFromReader(strings.NewReader(body))
 	dom.Find("._layout-thumbnail").Each(
 		func(i int, selection *goquery.Selection) {
@@ -48,20 +70,24 @@ func Craw(target string) error {
 			req, _ := http.NewRequest("GET", path1, nil)
 			req.Header.Set("Referer", "https://www.pixiv.net/artworks/"+id)
 
-			data, err := (&http.Client{}).Do(req)
+			data, err := client.Do(req)
 			if err != nil {
+				log.Println(req.URL, " failed")
 				return
 			}
 
 			readAll, err := io.ReadAll(data.Body)
 			if err != nil {
+				log.Println(req.URL, " failed")
 				return
 			}
 
 			err = os.WriteFile(filename, readAll, 0666)
 			if err != nil {
+				log.Println(req.URL, " failed")
 				return
 			}
+			log.Println(req.URL, " success")
 		},
 	)
 	return nil
