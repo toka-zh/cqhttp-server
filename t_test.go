@@ -9,6 +9,6 @@ import (
 func TestCraw(t *testing.T) {
 	target := "https://www.pixiv.net/ranking.php?mode=weekly&content=illust"
 	//target := "https://www.pixiv.net/ranking.php?mode=monthly&content=illust"
-	err := pkg.Craw(target)
+	err := pkg.PixivCraw(target)
 	fmt.Println(err)
 }

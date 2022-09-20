@@ -1,6 +1,7 @@
 package core
 
 import (
+	"cqhttp-server/config"
 	"cqhttp-server/internal/model"
 	"cqhttp-server/internal/pkg"
 	pkg2 "cqhttp-server/pkg"
@@ -24,7 +25,7 @@ type WebSocket struct {
 	conn *websocket.Conn
 }
 
-// SocketHandler 加入任务池
+// SocketHandler WS处理器,转入任务池处理
 func SocketHandler(c *gin.Context) {
 	group := NewGroup()
 	Register(group)
@@ -64,11 +65,11 @@ func SocketHandler(c *gin.Context) {
 }
 
 func Register(api *Group) {
-	api.Register("图片", func(ctx *Context) error {
-		path := pkg.GetRandFileAbsPath("./download")
+	api.Register("pixiv图片", func(ctx *Context) error {
+		path := pkg.GetRandFileAbsPath(config.SavePath)
 		if path == "" {
-			pkg2.Craw("https://www.pixiv.net/ranking.php?mode=monthly&content=illust")
-			path = pkg.GetRandFileAbsPath("./download")
+			pkg2.PixivCraw(config.PixivUrl)
+			path = pkg.GetRandFileAbsPath(config.SavePath)
 		}
 		callback := &model.Callback{
 			Action: "send_private_msg",
@@ -93,7 +94,7 @@ func Register(api *Group) {
 //		Params: model.PrivateSender{
 //			//MessageType: eventMsg.SubType,
 //			UserId:  eventMsg.Sender.UserId,
-//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath(config.SavePath)),
 //		},
 //	}
 //	_ = WsConn.conn.WriteJSON(callback)

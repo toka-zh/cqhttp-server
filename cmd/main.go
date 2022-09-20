@@ -1,26 +1,37 @@
 package main
 
 import (
+	"cqhttp-server/config"
 	"cqhttp-server/internal/core"
+	pkg2 "cqhttp-server/pkg"
 	"github.com/gin-gonic/gin"
 	"os"
 )
 
 func WSWorker() *core.Pool {
 	pool := core.New(10)
-	//.SetTimeout(10 * time.Second)
 	return pool
 }
 
-func main() {
+func cmd() bool {
 	args := os.Args
 	if args[0] == "-version" || args[0] == "-v" {
+		return true
+	}
+	return false
+}
+
+func main() {
+	// cmd模式
+	if cmd() {
 		return
 	}
 
+	// 注册全局变量
 	core.MyWorker = WSWorker()
-	// 注册路由器
+	go pkg2.PixivCraw(config.PixivUrl)
 
+	// 注册路由器,并升级http为ws
 	router := gin.Default()
 	router.GET("/ws", core.SocketHandler)
 

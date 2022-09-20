@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"cqhttp-server/config"
 	"cqhttp-server/internal/pkg"
 	"github.com/PuerkitoBio/goquery"
 	"io"
@@ -12,14 +13,14 @@ import (
 	"strings"
 )
 
-func Craw(target string) error {
+func PixivCraw(target string) error {
 	log.Println("pixiv craw running...")
 
 	// 确认下载目录在不在
-	_, err := os.Stat("./download")
+	_, err := os.Stat(config.SavePath)
 	if err != nil {
 		log.Println("download dir doesn't exist,recreate...")
-		os.Mkdir("./download", 0777)
+		os.Mkdir(config.SavePath, 0777)
 	}
 
 	// 获取不能爬取的列表
@@ -60,7 +61,7 @@ func Craw(target string) error {
 			}
 
 			//存在性检查
-			filename := "./download/" + path[strings.LastIndex(path, "/")+1:]
+			filename := config.SavePath + path[strings.LastIndex(path, "/")+1:]
 			if pkg.FileExists(filename) {
 				return
 			}

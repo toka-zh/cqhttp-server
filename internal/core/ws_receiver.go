@@ -1,6 +1,7 @@
 package core
 
 import (
+	"cqhttp-server/config"
 	"cqhttp-server/internal/model"
 	"cqhttp-server/internal/model/post"
 	"cqhttp-server/internal/pkg"
@@ -64,8 +65,12 @@ func (w WSReceiver) postHandler(err error) {
 
 	switch eventMsg.SubType {
 	case "friend":
+		// 私聊
 		//todo 注册
 		f := w.Group.GetHandler(eventMsg.Message)
+		if f == nil {
+			return
+		}
 
 		//todo 传入eventMsg 返回callback
 		ctx := Background(eventMsg)
@@ -88,13 +93,14 @@ func (w WSReceiver) postHandler(err error) {
 		//		Params: model.PrivateSender{
 		//			//MessageType: eventMsg.SubType,
 		//			UserId:  eventMsg.Sender.UserId,
-		//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath("./download")),
+		//			Message: fmt.Sprintf("[CQ:image,file=%s]", pkg.GetRandFileAbsPath(config.SavePath)),
 		//		},
 		//	}
 		//	_ = WsConn.conn.WriteJSON(callback)
 		//}
 	//case "group":
 	default:
+		// 默认/群组
 		var groupMsg *post.GroupMsg
 		err = json.Unmarshal(w.MetaMessage, &groupMsg)
 		if err != nil {
@@ -105,10 +111,25 @@ func (w WSReceiver) postHandler(err error) {
 		}
 
 		if strings.Contains(eventMsg.Message, "图片") {
-			path := pkg.GetRandFileAbsPath("./download")
+			path := pkg.GetRandFileAbsPath(config.SavePath)
 			if path == "" {
-				pkg2.Craw("https://www.pixiv.net/ranking.php?mode=monthly&content=illust")
-				path = pkg.GetRandFileAbsPath("./download")
+				pkg2.PixivCraw(config.PixivUrl)
+				path = pkg.GetRandFileAbsPath(config.SavePath)
+			}
+			callback := model.Callback{
+				Action: "send_group_msg",
+				Params: model.GroupSender{
+					GroupId: groupMsg.GroupId,
+					Message: fmt.Sprintf("[CQ:image,file=%s]", path),
+				},
+			}
+			_ = WsConn.conn.WriteJSON(callback)
+		} else if strings.Contains(eventMsg.Message, "壁纸") {
+			path := pkg.GetRandFileAbsPath(config.WHPath)
+			if path == "" {
+				//pkg2.PixivCraw(config.WHPath)
+				//path = pkg.GetRandFileAbsPath(config.SavePath)
+				return
 			}
 			callback := model.Callback{
 				Action: "send_group_msg",
