@@ -2,9 +2,14 @@ package handler
 
 import (
 	"cqhttp-server/internal/handler/pixiv"
+	"cqhttp-server/internal/handler/wallhaven"
 	"cqhttp-server/pkg/wscore"
 )
 
 func Register(api *wscore.Group) {
-	api.Register("pixiv图片", pixiv.Rank)
+	// p站插画日榜随机
+	api.Register("pixiv", pixiv.Rank)
+
+	// wall_haven Sketchy等级随机
+	api.Register("wh111", wallhaven.Sketchy)
 }

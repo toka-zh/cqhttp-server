@@ -34,6 +34,7 @@ func main() {
 
 	// 异步保存图片
 	go pkg.PixivCraw(config.Static.PixivUrl)
+	go pkg.WallHavenCraw(config.Static.WHUrl)
 
 	// 注册路由器,并升级http为ws
 	router := gin.Default()

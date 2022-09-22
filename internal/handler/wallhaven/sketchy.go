@@ -1,4 +1,4 @@
-package pixiv
+package wallhaven
 
 import (
 	"cqhttp-server/config"
@@ -7,11 +7,11 @@ import (
 	"fmt"
 )
 
-func Rank(ctx *wscore.Context) error {
-	path := pkg.GetRandFileAbsPath(config.SavePath)
+func Sketchy(ctx *wscore.Context) error {
+	path := pkg.GetRandFileAbsPath(config.WHPath)
 	if path == "" {
-		pkg.PixivCraw(config.Static.PixivUrl)
-		path = pkg.GetRandFileAbsPath(config.SavePath)
+		pkg.WallHavenCraw(config.Static.PixivUrl)
+		path = pkg.GetRandFileAbsPath(config.WHPath)
 	}
 	callback := &wscore.Callback{
 		Params: &wscore.CallbackSender{
