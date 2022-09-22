@@ -12,4 +12,6 @@ func Register(api *wscore.Group) {
 
 	// wall_haven Sketchy等级随机
 	api.Register("wh111", wallhaven.Sketchy)
+
+	// todo 手动更新图,返回下载图的数量
 }
