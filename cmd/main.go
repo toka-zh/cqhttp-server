@@ -2,20 +2,22 @@ package main
 
 import (
 	"cqhttp-server/config"
-	"cqhttp-server/internal/core"
-	pkg2 "cqhttp-server/pkg"
+	"cqhttp-server/internal/api"
+	"cqhttp-server/pkg"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
 )
 
-func WSWorker() *core.Pool {
-	pool := core.New(10)
+func WSWorker() *pkg.Pool {
+	pool := pkg.New(10)
 	return pool
 }
 
 func cmd() bool {
 	args := os.Args
 	if args[0] == "-version" || args[0] == "-v" {
+		fmt.Println(config.Config.Version)
 		return true
 	}
 	return false
@@ -28,12 +30,14 @@ func main() {
 	}
 
 	// 注册全局变量
-	core.MyWorker = WSWorker()
-	go pkg2.PixivCraw(config.PixivUrl)
+	pkg.MyWorker = WSWorker()
+
+	// 异步保存图片
+	go pkg.PixivCraw(config.Static.PixivUrl)
 
 	// 注册路由器,并升级http为ws
 	router := gin.Default()
-	router.GET("/ws", core.SocketHandler)
+	router.GET("/ws", api.SocketHandler)
 
-	_ = router.Run(":9999")
+	_ = router.Run(config.Config.Port)
 }

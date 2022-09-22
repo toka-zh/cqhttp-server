@@ -1,4 +1,4 @@
-package post
+package wscore
 
 // Event 上报事件通用数据
 type Event struct {

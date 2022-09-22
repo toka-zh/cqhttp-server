@@ -1,4 +1,4 @@
-package post
+package wscore
 
 // Message 消息上报(PostType 为 message)数据
 type Message struct {
