@@ -2,15 +2,15 @@ package main
 
 import (
 	"cqhttp-server/config"
-	"cqhttp-server/internal/api"
-	"cqhttp-server/pkg"
+	"cqhttp-server/internal/handler"
+	"cqhttp-server/internal/pkg/wscore"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
 )
 
-func WSWorker() *pkg.Pool {
-	pool := pkg.New(10)
+func WSWorker() *wscore.Pool {
+	pool := wscore.New(10)
 	return pool
 }
 
@@ -30,15 +30,15 @@ func main() {
 	}
 
 	// 注册全局变量
-	pkg.MyWorker = WSWorker()
+	wscore.MyWorker = WSWorker()
 
 	// 异步保存图片
-	go pkg.PixivCraw(config.Static.PixivUrl)
-	go pkg.WallHavenCraw(config.Static.WHUrl)
+	//go pkg.PixivCraw(config.Static.PixivUrl)
+	//go pkg.WallHavenCraw(config.Static.WHUrl)
 
 	// 注册路由器,并升级http为ws
 	router := gin.Default()
-	router.GET("/ws", api.SocketHandler)
+	router.GET("/ws", handler.SocketHandler)
 
 	_ = router.Run(config.Config.Port)
 }

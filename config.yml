@@ -1,8 +1,10 @@
 port: ":9999"
 version: "v0.0.1"
 pixiv_rank_url: ""
+whitelist_group_con: false
 whitelist_group:
-  - 600619195
-  - 767068074
+  - 123456789
+  - 123456789
+whitelist_private_con: false
 whitelist_private:
-  - 978766951
+  - 123456789

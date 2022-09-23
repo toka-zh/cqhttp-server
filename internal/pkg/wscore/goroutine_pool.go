@@ -1,4 +1,4 @@
-package pkg
+package wscore
 
 import (
 	"sync"

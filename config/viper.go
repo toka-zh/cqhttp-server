@@ -13,6 +13,9 @@ var Config struct {
 	WhitelistPrivate []int64 `mapstructure:"whitelist_private"`
 	WhitelistGroup   []int64 `mapstructure:"whitelist_group"`
 
+	WhitelistPrivateFlg bool `mapstructure:"whitelist_private_con"`
+	WhitelistGroupFlg   bool `mapstructure:"whitelist_group_con"`
+
 	WhiteListPrivateMap map[int64]struct{}
 	WhiteListGroupMap   map[int64]struct{}
 }

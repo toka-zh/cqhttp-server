@@ -1,7 +1,8 @@
-package pkg
+package craw
 
 import (
 	"cqhttp-server/config"
+	"cqhttp-server/pkg"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"log"
@@ -61,7 +62,7 @@ func PixivCraw(target string) error {
 
 			//存在性检查
 			filename := config.SavePath + path[strings.LastIndex(path, "/")+1:]
-			if FileExists(filename) {
+			if pkg.FileExists(filename) {
 				return
 			}
 
