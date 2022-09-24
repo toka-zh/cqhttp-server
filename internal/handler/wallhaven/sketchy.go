@@ -26,7 +26,7 @@ func Sketchy(ctx *wscore2.Context) error {
 func X18(ctx *wscore2.Context) error {
 	path := pkg.GetRandFileAbsPath(config.X18Path)
 	if path == "" {
-		craw.WallHavenCraw(config.Static.WHUrl, config.WHPath)
+		craw.WallHavenCraw(config.Static.WHUrl, config.X18Path)
 		path = pkg.GetRandFileAbsPath(config.X18Path)
 	}
 	callback := &wscore2.Callback{

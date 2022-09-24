@@ -4,11 +4,10 @@ cqhttp的消息处理服务端,负责解析接收到的qq消息,并处理
 目前实现消息交互,正在拓展具体的消息处理
 
 ## 功能
-* 消息处理框架,接收go-cqhttp的消息
-* 随机获取pixiv排行版图片
-* 随机获取wallhaven图片
+* 封装go-cqhttp消息处理框架,根据消息内容与发送类型进行处理并返回
+* 爬取pixiv排行版,wallhaven图片,发送固定消息后随机返回
 * 支持通过配置文件修改白名单(私聊、群聊)
-* todo 通过消息更新图片
+* todo 图片更新定时任务｜通过消息更新图片
 
 ## 环境
 1. 配置并启用go-cqhttp
@@ -28,3 +27,8 @@ cqhttp的消息处理服务端,负责解析接收到的qq消息,并处理
   4. 直接运行二进制文件`./cqhttp-server`
 
 如果无法爬取pivix图片,需要本地挂梯子并且代理端口 7890(clashX默认代理端口)
+
+## 技术栈
+* 后端服务: [gin](github.com/gin-gonic/gin)｜[websocket](github.com/gorilla/websocket)
+* 爬虫数据处理: [goquery](github.com/PuerkitoBio/goquery)
+
