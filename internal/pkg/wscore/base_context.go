@@ -1,0 +1,21 @@
+package wscore
+
+import "encoding/json"
+
+type Context struct {
+	Callback *Callback
+	attr     map[string]interface{}
+	MetaMsg  []byte
+	EventMsg *Message
+}
+
+func Background(metaMsg []byte) *Context {
+
+	var eventMsg *Message
+	json.Unmarshal(metaMsg, &eventMsg)
+	return &Context{
+		MetaMsg:  metaMsg,
+		EventMsg: eventMsg,
+		attr:     make(map[string]interface{}),
+	}
+}

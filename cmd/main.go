@@ -2,7 +2,7 @@ package main
 
 import (
 	"cqhttp-server/config"
-	"cqhttp-server/internal/handler"
+	"cqhttp-server/internal/api"
 	"cqhttp-server/internal/pkg/wscore"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -38,7 +38,7 @@ func main() {
 
 	// 注册路由器,并升级http为ws
 	router := gin.Default()
-	router.GET("/ws", handler.SocketHandler)
+	router.GET("/ws", api.SocketHandler)
 
 	_ = router.Run(config.Config.Port)
 }

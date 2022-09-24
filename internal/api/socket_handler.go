@@ -1,4 +1,4 @@
-package handler
+package api
 
 import (
 	"cqhttp-server/internal/handler/pixiv"
@@ -9,15 +9,15 @@ import (
 
 func SocketHandler(ctx *gin.Context) {
 	// 注册
-	group := wscore.NewGroup()
+	router := wscore.NewRouterGroup()
 	// p站插画日榜随机
-	group.Handle("pixiv", pixiv.Rank)
-
+	router.All("pixiv", pixiv.Rank)
 	// wall_haven Sketchy等级随机
-	group.Handle("wh111", wallhaven.Sketchy)
+	router.All("wallhaven", wallhaven.Sketchy)
+	// 色图
+	router.GroupTmp("我要色色", wallhaven.X18)
 
-	group.Handle("我要色色", wallhaven.X18)
-
-	wscore.UpdateWebSocket(ctx, group)
+	// 协议升级,接入API
+	wscore.UpdateWebSocket(ctx, router)
 
 }

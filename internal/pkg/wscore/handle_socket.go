@@ -1,7 +1,6 @@
 package wscore
 
 import (
-	"cqhttp-server/config"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -12,7 +11,7 @@ import (
 
 // UpdateWebSocket WS处理器,转入任务池处理
 
-func UpdateWebSocket(c *gin.Context, group *Group) {
+func UpdateWebSocket(c *gin.Context, group *RouterGroup) {
 
 	// 注册websocket
 	upGrader := websocket.Upgrader{
@@ -73,59 +72,13 @@ func (w WSReceiver) eventHandler() {
 }
 
 func (w WSReceiver) postHandler(err error) {
-	var eventMsg *Message
-	err = json.Unmarshal(w.MetaMessage, &eventMsg)
-	if err != nil {
-		return
-	}
+	ctx := Background(w.MetaMessage)
 	// 私聊
 	//todo 注册
-	f := w.Group.GetHandler(eventMsg.Message)
-	if f == nil {
-		return
-	}
+
+	w.Router.UseHandle(ctx)
 
 	//todo 传入eventMsg 返回callback
-	ctx := Background(eventMsg)
-	err = f(ctx)
-	if err != nil {
-		return
-	}
-	if ctx.Callback == nil {
-		return
-	}
-
-	switch eventMsg.SubType {
-	case "friend":
-		if _, ok := config.Config.WhiteListPrivateMap[ctx.MetaMsg.Sender.UserId]; !ok &&
-			config.Config.WhitelistPrivateFlg {
-			return
-		}
-		ctx.Callback.Action = "send_private_msg"
-		ctx.Callback.Params.(*CallbackSender).UserId = &ctx.MetaMsg.Sender.UserId
-	case "group": //临时回话
-		if _, ok := config.Config.WhiteListPrivateMap[ctx.MetaMsg.Sender.UserId]; !ok &&
-			config.Config.WhitelistPrivateFlg {
-			return
-		}
-		ctx.Callback.Action = "send_private_msg"
-		ctx.Callback.Params.(*CallbackSender).UserId = &ctx.MetaMsg.Sender.UserId
-	case "normal":
-		//群组
-		var groupMsg *GroupMsg
-		err = json.Unmarshal(w.MetaMessage, &groupMsg)
-		if err != nil {
-			return
-		}
-
-		if _, ok := config.Config.WhiteListGroupMap[groupMsg.GroupId]; !ok &&
-			config.Config.WhitelistGroupFlg {
-			return
-		}
-
-		ctx.Callback.Action = "send_group_msg"
-		ctx.Callback.Params.(*CallbackSender).GroupId = &groupMsg.GroupId
-	}
 
 	_ = WsConn.Conn.WriteJSON(ctx.Callback)
 
