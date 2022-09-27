@@ -2,20 +2,20 @@ package pixiv
 
 import (
 	"cqhttp-server/config"
-	wscore2 "cqhttp-server/internal/pkg/wscore"
-	"cqhttp-server/pkg"
+	"cqhttp-server/internal/pkg/wscore"
 	"cqhttp-server/pkg/craw"
+	"cqhttp-server/pkg/utils"
 	"fmt"
 )
 
-func Rank(ctx *wscore2.Context) error {
-	path := pkg.GetRandFileAbsPath(config.SavePath)
+func Rank(ctx *wscore.Context) error {
+	path := utils.GetRandFileAbsPath(config.SavePath)
 	if path == "" {
-		craw.PixivCraw(config.Static.PixivUrl)
-		path = pkg.GetRandFileAbsPath(config.SavePath)
+		_ = craw.PixivCraw(config.Static.PixivUrl)
+		path = utils.GetRandFileAbsPath(config.SavePath)
 	}
-	callback := &wscore2.Callback{
-		Params: &wscore2.CallbackSender{
+	callback := &wscore.Callback{
+		Params: &wscore.CallbackSender{
 			Message: fmt.Sprintf("[CQ:image,file=%s]", path),
 		},
 	}

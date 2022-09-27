@@ -3,6 +3,7 @@ package main
 import (
 	"cqhttp-server/config"
 	"cqhttp-server/internal/api"
+	_ "cqhttp-server/internal/cron"
 	"cqhttp-server/internal/pkg/wscore"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -31,10 +32,6 @@ func main() {
 
 	// 注册全局变量
 	wscore.MyWorker = WSWorker()
-
-	// 异步保存图片
-	//go pkg.PixivCraw(config.Static.PixivUrl)
-	//go pkg.WallHavenCraw(config.Static.WHUrl)
 
 	// 注册路由器,并升级http为ws
 	router := gin.Default()

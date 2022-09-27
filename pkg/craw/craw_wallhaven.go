@@ -1,7 +1,7 @@
 package craw
 
 import (
-	"cqhttp-server/pkg"
+	"cqhttp-server/pkg/utils"
 	"errors"
 	"github.com/PuerkitoBio/goquery"
 	"io"
@@ -72,7 +72,7 @@ func WallHavenCraw(target, filePath string) error {
 					parse, _ := url.Parse(fileURL)
 					split := strings.Split(parse.Path, "/")
 					filename := split[len(split)-1]
-					if pkg.FileExists(filename) {
+					if utils.FileExists(filename) {
 						return
 					}
 

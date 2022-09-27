@@ -1,5 +1,5 @@
 .PHONY: buildandrun
-BIN_FILE=cqhttp-server
+BIN_FILE= ../bin/cqhttp-server
 
 build linux:
 	CGO_ENABLED=0 \

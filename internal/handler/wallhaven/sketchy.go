@@ -3,16 +3,16 @@ package wallhaven
 import (
 	"cqhttp-server/config"
 	wscore2 "cqhttp-server/internal/pkg/wscore"
-	"cqhttp-server/pkg"
 	"cqhttp-server/pkg/craw"
+	"cqhttp-server/pkg/utils"
 	"fmt"
 )
 
 func Sketchy(ctx *wscore2.Context) error {
-	path := pkg.GetRandFileAbsPath(config.WHPath)
+	path := utils.GetRandFileAbsPath(config.WHPath)
 	if path == "" {
-		craw.WallHavenCraw(config.Static.WHUrl, config.WHPath)
-		path = pkg.GetRandFileAbsPath(config.WHPath)
+		_ = craw.WallHavenCraw(config.Static.WHUrl, config.WHPath)
+		path = utils.GetRandFileAbsPath(config.WHPath)
 	}
 	callback := &wscore2.Callback{
 		Params: &wscore2.CallbackSender{
@@ -24,10 +24,10 @@ func Sketchy(ctx *wscore2.Context) error {
 }
 
 func X18(ctx *wscore2.Context) error {
-	path := pkg.GetRandFileAbsPath(config.X18Path)
+	path := utils.GetRandFileAbsPath(config.X18Path)
 	if path == "" {
-		craw.WallHavenCraw(config.Static.WHUrl, config.X18Path)
-		path = pkg.GetRandFileAbsPath(config.X18Path)
+		_ = craw.WallHavenCraw(config.Static.WHUrl, config.X18Path)
+		path = utils.GetRandFileAbsPath(config.X18Path)
 	}
 	callback := &wscore2.Callback{
 		Params: &wscore2.CallbackSender{
