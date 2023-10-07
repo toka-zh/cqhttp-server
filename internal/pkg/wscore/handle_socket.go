@@ -13,25 +13,28 @@ import (
 
 func UpdateWebSocket(c *gin.Context, group *RouterGroup) {
 
-	// 注册websocket
-	upGrader := websocket.Upgrader{
+	// 建立握手对象
+	handShake := websocket.Upgrader{
 		CheckOrigin:     func(r *http.Request) bool { return true },
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
 
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	// 注册websocket
+	wsConn, err := handShake.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	defer func() {
+		// 自动关闭ws
 		closeErr := wsConn.Close()
 		if closeErr != nil {
 			panic(err)
 		}
 	}()
 
+	// 包装到WebSocket全局对象内
 	WsConn = &WebSocket{Conn: wsConn}
 
 	log.Println("ws connect success")
@@ -43,12 +46,12 @@ func UpdateWebSocket(c *gin.Context, group *RouterGroup) {
 		}
 
 		//获取到消息byte
-
 		MyWorker.Run(group.NewReceiver(msg, 8*time.Second))
 	}
 
 }
 
+// 请求处理，根据请求类型进行处理
 func (w WSReceiver) eventHandler() {
 	var event *Event
 	err := json.Unmarshal(w.MetaMessage, &event)

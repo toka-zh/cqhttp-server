@@ -3,33 +3,23 @@ package main
 import (
 	"cqhttp-server/config"
 	"cqhttp-server/internal/api"
-	_ "cqhttp-server/internal/cron"
+	_ "cqhttp-server/internal/pkg/cron"
 	"cqhttp-server/internal/pkg/wscore"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"os"
 )
+
+func main() {
+	run()
+}
 
 func WSWorker() *wscore.Pool {
 	pool := wscore.New(10)
 	return pool
 }
 
-func cmd() bool {
-	args := os.Args
-	if args[0] == "-version" || args[0] == "-v" {
-		fmt.Println(config.Config.Version)
-		return true
-	}
-	return false
-}
-
-func main() {
-	// cmd模式
-	if cmd() {
-		return
-	}
-
+func run() {
+	fmt.Println(config.Config.Version, "is running...")
 	// 注册全局变量
 	wscore.MyWorker = WSWorker()
 

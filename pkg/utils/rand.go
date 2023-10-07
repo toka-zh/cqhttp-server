@@ -8,6 +8,6 @@ import (
 // RandInt 获取随机数
 func RandInt(n int) int {
 	now := time.Now()
-	rand.Seed(now.Unix())
+	rand.NewSource(now.Unix())
 	return rand.Intn(n)
 }

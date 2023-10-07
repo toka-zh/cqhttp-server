@@ -1,3 +1,4 @@
+#config
 port: ":9999"
 version: "v0.0.1"
 pixiv_rank_url: ""

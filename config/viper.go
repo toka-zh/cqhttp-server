@@ -20,6 +20,7 @@ var Config struct {
 	WhiteListGroupMap   map[int64]struct{}
 }
 
+// load config
 func init() {
 	viper.SetConfigFile("./config.yml")
 	err := viper.ReadInConfig()

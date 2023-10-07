@@ -12,7 +12,10 @@ type Context struct {
 func Background(metaMsg []byte) *Context {
 
 	var eventMsg *Message
-	json.Unmarshal(metaMsg, &eventMsg)
+	err := json.Unmarshal(metaMsg, &eventMsg)
+	if err != nil {
+		return nil
+	}
 	return &Context{
 		MetaMsg:  metaMsg,
 		EventMsg: eventMsg,
